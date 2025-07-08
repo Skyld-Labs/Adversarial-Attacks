@@ -1,0 +1,7 @@
+data/*
+!data/custom_images
+!data/yolov5s.pt
+!data/configs
+
+__pycache__
+venv

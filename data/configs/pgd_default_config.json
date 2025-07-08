@@ -1,0 +1,14 @@
+{
+    "THRESHOLD" : 0.6,
+    "TARGET_CLASS" : "bird",
+    "VICTIM_CLASS" : "airplane",
+    "BATCH_SIZE" : 5,
+    "IOU_THRESHOLD" : 0.5,
+    "MAX_ITER" : 500,
+    "NORM" : "inf",
+    "EPS" : 1.0,
+    "TARGET_LOCATION" : [170, 170],
+    "TARGET_SHAPE" : [3, 300, 300],
+    "IMAGES_TO_DISPLAY" : 3,
+    "FOLDER_NAME" : "original"
+}
