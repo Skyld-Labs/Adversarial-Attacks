@@ -40,7 +40,7 @@ The repository includes interactive notebooks that allow you to:
 1. **Clone the repository**:
    ```bash
    git clone <repository-url>
-   cd example_adversarial_attacks
+   cd Adversarial-Attacks
    ```
 
 2. **Create a virtual environment** (recommended):
@@ -60,26 +60,32 @@ The repository includes interactive notebooks that allow you to:
 ## Project Structure
 
 ```
-example_adversarial_attacks/
+Adversarial-Attacks/
 ├── README.md                                    # This file
 ├── requirements.txt                             # Python dependencies
 ├── .gitignore                                   # Git ignore rules
 ├── data/                                        # Data and configuration files
 │   ├── yolov5s.pt                              # YOLOv5 model weights
 │   ├── configs/                                 # Configuration files
-│   │   └── pgd_default_config.json             # Default PGD configuration
+│   │   ├── pgd_default_config.json             # Default PGD configuration
+│   │   └── adv_patch_default_config.json       # Default Patch configuration
 │   ├── custom_images/                           # Input images for attacks
 │   │   ├── airplane0.jpg
+│   │   ├── car0.JPG
 │   │   └── ...
 │   ├── original/                                # Original detection results
-│   └── ProjectedGradientDescent/                # PGD attack results
+│   ├── ProjectedGradientDescent/                # PGD attack results
+│   └── AdversarialPatchPytorch/                 # Patch attack results
+│       ├── AdversarialPatchPytorch0.png
+│       └── ...
 └── src/                                         # Source code
     ├── notebook_white_box_pgd.ipynb            # PGD attack notebook
     ├── notebook_white_box_adversarial_patch.ipynb  # Patch attack notebook
     ├── attacks/                                 # Attack implementations
     │   └── white_boxes/                         # White-box attacks
     │       ├── local_projected_gradient_descent.py
-    │       └── local_adversarial_patch_pytorch.py
+    │       ├── local_adversarial_patch_pytorch.py
+    │       └── white_box_attack.py
     └── utils/                                   # Utility functions
         ├── utils.py                             # General utilities
         └── utils_detector_yolo.py               # YOLO-specific utilities
@@ -110,18 +116,36 @@ Attacks are configured using JSON files in the `data/configs/` directory. The co
 ### PGD Attack Parameters
 ```json
 {
-  "THRESHOLD": 0.6,
-  "TARGET_CLASS": null,
-  "VICTIM_CLASS": "airplane",
-  "BATCH_SIZE": 5,
-  "IOU_THRESHOLD": 0.5,
-  "MAX_ITER": 100,
-  "NORM": "inf",
-  "EPS": 1.0,
-  "TARGET_LOCATION": [50, 50],
-  "TARGET_SHAPE": [3, 100, 100],
-  "IMAGES_TO_DISPLAY": 3,
-  "FOLDER_NAME": "original"
+    "THRESHOLD" : 0.6,
+    "TARGET_CLASS" : "bird",
+    "VICTIM_CLASS" : "airplane",
+    "BATCH_SIZE" : 5,
+    "IOU_THRESHOLD" : 0.5,
+    "MAX_ITER" : 500,
+    "NORM" : "inf",
+    "EPS" : 1.0,
+    "TARGET_LOCATION" : [170, 170],
+    "TARGET_SHAPE" : [3, 300, 300],
+    "IMAGES_TO_DISPLAY" : 3,
+    "FOLDER_NAME" : "original"
+}
+```
+
+### Adversarial Patch Parameters
+```json
+{
+    "THRESHOLD" : 0.6,
+    "TARGET_CLASS" : "",
+    "VICTIM_CLASS" : "car",
+    "BATCH_SIZE" : 5,
+    "IOU_THRESHOLD" : 0.5,
+    "MAX_ITER" : 500,
+    "NORM" : "inf",
+    "EPS" : 1.0,
+    "TARGET_LOCATION" : [200, 200],
+    "TARGET_SHAPE" : [3, 100, 100],
+    "IMAGES_TO_DISPLAY" : 3,
+    "FOLDER_NAME" : "original"
 }
 ```
 
@@ -182,6 +206,39 @@ attack_predictions, adversarial_examples = attack.apply_attack_to_image(
 )
 ```
 
+### Running an Adversarial Patch Attack
+```python
+# Load configuration
+config = load_config("../data/configs/adv_patch_default_config.json")
+
+# Create estimator
+estimated_object_detector = UtilsDetectorYolo(config.BATCH_SIZE, config.THRESHOLD, config.VICTIM_CLASS)
+
+# Initialize attack
+attack = LocalAdversarialPatchPytorch(
+    estimator=estimated_object_detector,
+    images=IMAGES,
+    orig_predictions=original_predictions, 
+    target_class=config.TARGET_CLASS
+    )
+
+# Generate the patch attack
+patch, _ = attack.generate(
+    images = IMAGES,
+    orig_predictions = original_predictions,
+    target_shape = config.TARGET_SHAPE,
+    target_location = config.TARGET_LOCATION,
+    max_iter = config.MAX_ITER
+)
+
+# Apply the attack to the images 
+attack_predictions, adversarial_examples = attack.apply_attack_to_image(
+    image=IMAGES,
+    train_on=len(IMAGES),
+    threshold=config.THRESHOLD,
+)
+```
+
 ### Custom Image Dataset
 Place your images in `data/custom_images/` and update the configuration:
 ```json
@@ -196,7 +253,7 @@ Place your images in `data/custom_images/` and update the configuration:
 Attack results are automatically saved in organized folders:
 - **Original detections**: `data/original/`
 - **PGD results**: `data/ProjectedGradientDescent/`
-- **Patch results**: `data/AdversarialPatch/`
+- **Patch results**: `data/AdversarialPatchPytorch/`
 
 Each result includes:
 - Visualized detection boxes
@@ -211,6 +268,7 @@ Each result includes:
 - Matplotlib
 - OpenCV
 - ART (Adversarial Robustness Toolbox)
+- YOLOv5
 - Jupyter Notebook
 
 See `requirements.txt` for complete dependency list.

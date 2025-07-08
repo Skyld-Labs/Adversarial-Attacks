@@ -1,0 +1,14 @@
+{
+    "THRESHOLD" : 0.6,
+    "TARGET_CLASS" : "",
+    "VICTIM_CLASS" : "car",
+    "BATCH_SIZE" : 5,
+    "IOU_THRESHOLD" : 0.5,
+    "MAX_ITER" : 500,
+    "NORM" : "inf",
+    "EPS" : 1.0,
+    "TARGET_LOCATION" : [200, 200],
+    "TARGET_SHAPE" : [3, 100, 100],
+    "IMAGES_TO_DISPLAY" : 3,
+    "FOLDER_NAME" : "original"
+}
