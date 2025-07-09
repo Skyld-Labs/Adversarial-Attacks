@@ -1,4 +1,5 @@
 from attacks.white_boxes.white_box_attack import WhiteBoxAttack
+
 from utils.utils import check_image_format
 
 from art.attacks.evasion import AdversarialPatchPyTorch
@@ -60,7 +61,7 @@ class LocalAdversarialPatchPytorch(WhiteBoxAttack):
         scale_max = (scale + 0.1) if scale < 0.9 else 1.0
         distortion_scale_max = 0.0
         learning_rate = 1.99
-        batch_size = 4 if not isinstance(self.estimator.estimator, PyTorchFasterRCNN) else 1
+        batch_size = 4
         patch_type = "square"
         optimizer = "pgd"
 

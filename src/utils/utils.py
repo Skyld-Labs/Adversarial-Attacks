@@ -1,9 +1,10 @@
+import os
 import numpy as np
 import torch
 import json
 from easydict import EasyDict
 from torchvision.ops import nms
-
+from matplotlib import pyplot as plt
 
 
 def nms_on_predictions(predictions, iou_threshold=0.5):
@@ -67,3 +68,21 @@ def load_config(cfg_path: str) -> EasyDict:
         cfg_dict = json.load(json_file)
 
     return EasyDict(cfg_dict)
+
+def plot_patch(patch, file_name, folder="data/"):
+    """
+    Plot the adversarial patch.
+
+    Args:
+        patch (np.ndarray): The adversarial patch to plot.
+        file_name (str): The name of the file to save the plot. Without the .png at the end.
+    """
+    os.makedirs(folder, exist_ok=True)
+    
+    plt.figure()
+    plt.axis("off")
+    plt.title(file_name)
+    plt.imshow(patch.transpose(1, 2, 0).astype(np.uint8))
+    plt.savefig(folder + file_name + ".png")
+    plt.show()
+    plt.close()
