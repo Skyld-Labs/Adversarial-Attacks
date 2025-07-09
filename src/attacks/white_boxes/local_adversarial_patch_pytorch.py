@@ -1,9 +1,7 @@
 from attacks.white_boxes.white_box_attack import WhiteBoxAttack
-
 from utils.utils import check_image_format
 
 from art.attacks.evasion import AdversarialPatchPyTorch
-from art.estimators.object_detection.pytorch_faster_rcnn import PyTorchFasterRCNN
 
 import numpy as np
 
