@@ -212,7 +212,8 @@ class UtilsDetectorYolo():
                 else:
                     return self.model(x)[0]
 
-        self.model = torch.load("../data/yolov5s.pt")["model"].float().to('cuda:0')
+        device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+        self.model = torch.load("../data/yolov5s.pt")["model"].float().to(device)
         self.model = Yolo(self.model)
         self.model.eval()
 
